@@ -1,54 +1,236 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>LandSlide Data Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <canvas id="myLineChart" width="400" height="200"></canvas>
-    <script>
-        // Lấy dữ liệu từ PHP và parse thành đối tượng JavaScript
-        const data = {!! $data !!};
 
-        const datasets = [
-            {
-                label: 'PZ1_(Digit)',
-                data: data.map(item => ({ x: new Date(item.created_at), y: parseFloat(item.PZ1_Digit) })),
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                fill: false,
-                tension: 0.4
-            }
+    <script>
+        // Lấy dữ liệu từ controller
+        const datasets = {!! $chartData !!};
+        const datasetsB = {!! $chartDataB !!};
+        const lineCount = {!! $lineCount !!};
+
+        // Cập nhật số lượng đường
+        document.getElementById('lineCount').textContent = lineCount;
+
+        // Định nghĩa các màu cho từng đường
+        const colors = [
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(201, 203, 207, 1)'
         ];
 
-        const ctx = document.getElementById('myLineChart').getContext('2d');
-        const myLineChart = new Chart(ctx, {
+        // Áp dụng màu và style cho mỗi dataset
+        datasets.forEach((dataset, index) => {
+            dataset.borderColor = colors[index % colors.length];
+            dataset.borderWidth = 2;
+            dataset.fill = false;
+            dataset.showLine = true;
+            dataset.tension = 0.2;
+        });
+        datasetsB.forEach((dataset, index) => {
+            dataset.borderColor = colors[index % colors.length];
+            dataset.borderWidth = 2;
+            dataset.fill = false;
+            dataset.showLine = true;
+            dataset.tension = 0.2;
+        });
+
+        const ctx = document.getElementById('landslideChart').getContext('2d');
+        const landslideChart = new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: datasets
             },
             options: {
+                responsive: true,
                 scales: {
                     x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day'
-                        },
+                        type: 'linear',
+                        position: 'bottom',
                         title: {
                             display: true,
-                            text: 'Date'
+                            text: 'Chuyển vị ngang tích lũy (mm) từ ngày 19/11/2023'
                         }
                     },
                     y: {
                         beginAtZero: false,
                         title: {
                             display: true,
-                            text: 'PZ1_(Digit) Value'
+                            text: 'Độ cao (m)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Đo nghiêng, hướng Tây - Đông'    
+                        // font: {
+                        //     size: 20,
+                        //     weight: 'bold'
+                        //     }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.x !== null) {
+                                    label += `(${context.parsed.x.toFixed(3)}, ${context.parsed.y})`;
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'xy',
                         }
                     }
                 }
             }
         });
+
+        const chartB = document.getElementById('showChartB').getContext('2d');
+        const showChartB = new Chart(chartB, {
+            type: 'line',
+            data: {
+                datasets: datasetsB
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Chuyển vị ngang tích lũy (mm) từ ngày 19/11/2023'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Độ cao (m)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Đo nghiêng, hướng Bắc - Nam'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.x !== null) {
+                                    label += `(${context.parsed.x.toFixed(3)}, ${context.parsed.y})`;
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'xy',
+                        }
+                    }
+                }
+            }
+        });
+
+        // Thêm chức năng ẩn/hiện legend cho cả hai biểu đồ
+        function setupToggleLegend(chartInstance, toggleId) {
+            const toggleLegend = document.getElementById(toggleId);
+            const arrowIcon = toggleLegend.querySelector('.arrow-icon');
+
+            toggleLegend.addEventListener('click', () => {
+                const legendDisplay = chartInstance.options.plugins.legend.display;
+                chartInstance.options.plugins.legend.display = !legendDisplay;
+                chartInstance.update();
+
+                arrowIcon.classList.toggle('up');
+            });
+        }
+
+        setupToggleLegend(landslideChart, 'toggleLegendA');
+        setupToggleLegend(showChartB, 'toggleLegendB');
+
+        // Xử lý form chọn khoảng thời gian
+        document.getElementById('dateRangeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            
+            // Chuyển hướng với tham số mới
+            window.location.href = `${window.location.pathname}?start_date=${startDate}&end_date=${endDate}`;
+        });
+
+        // Lọc dữ liệu theo thời gian
+        function filterDataByDateRange(datasets, startDate, endDate) {
+            return datasets.map(dataset => {
+                if (dataset.label === 'Điểm chuẩn') return dataset;
+                
+                const filteredData = dataset.data.filter(point => {
+                    const pointDate = new Date(dataset.label);
+                    return pointDate >= new Date(startDate) && pointDate <= new Date(endDate);
+                });
+                
+                return {...dataset, data: filteredData};
+            }).filter(dataset => dataset.data.length > 0 || dataset.label === 'Điểm chuẩn');
+        }
+
+        // Áp dụng bộ lọc nếu có tham số thời gian
+        const urlParams = new URLSearchParams(window.location.search);
+        const startDate = urlParams.get('start_date');
+        const endDate = urlParams.get('end_date');
+
+        if (startDate && endDate) {
+            datasets = filterDataByDateRange(datasets, startDate, endDate);
+            datasetsB = filterDataByDateRange(datasetsB, startDate, endDate);
+            
+            // Cập nhật biểu đồ
+            landslideChart.data.datasets = datasets;
+            landslideChart.update();
+            
+            showChartB.data.datasets = datasetsB;
+            showChartB.update();
+            
+            // Cập nhật số lượng đường
+            document.getElementById('lineCount').textContent = datasets.length - 1; // Trừ 1 vì có điểm chuẩn
+        }
     </script>
-</body>
-</html>

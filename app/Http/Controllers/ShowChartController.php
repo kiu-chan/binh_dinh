@@ -9,38 +9,38 @@ use Carbon\Carbon;
 
 class ShowChartController extends Controller
 {
-    public function showChart()
-    {
-        return view('chart');
-    }
+    // public function showChart()
+    // {
+    //     return view('chart');
+    // }
 
-    public function fetchData()
-    {
-        $response = Http::get('http://171.244.133.49/api/getLandSlideRawData');
+    // public function fetchData()
+    // {
+    //     $response = Http::get('http://171.244.133.49/api/getLandSlideRawData');
         
-        if ($response->successful()) {
-            $data = $response->json()['data'];
-            $filteredData = array_map(function($item) {
-                $fields = [];
-                foreach (explode(';', $item['raw_content']) as $field) {
-                    list($key, $value) = explode(',', $field);
-                    $fields[$key] = $value;
-                }
-                return [
-                    'id' => $item['id'],
-                    'Tilt_A_Or_1_sin' => $fields['Tilt_A_Or_1_sin'] ?? null,
-                    'Tilt_A_Or_2_sin' => $fields['Tilt_A_Or_2_sin'] ?? null,
-                    'Tilt_A_Or_3_sin' => $fields['Tilt_A_Or_3_sin'] ?? null,
-                    'created_at' => $item['created_at'],
-                    'updated_at' => $item['updated_at']
-                ];
-            }, $data);
+    //     if ($response->successful()) {
+    //         $data = $response->json()['data'];
+    //         $filteredData = array_map(function($item) {
+    //             $fields = [];
+    //             foreach (explode(';', $item['raw_content']) as $field) {
+    //                 list($key, $value) = explode(',', $field);
+    //                 $fields[$key] = $value;
+    //             }
+    //             return [
+    //                 'id' => $item['id'],
+    //                 'Tilt_A_Or_1_sin' => $fields['Tilt_A_Or_1_sin'] ?? null,
+    //                 'Tilt_A_Or_2_sin' => $fields['Tilt_A_Or_2_sin'] ?? null,
+    //                 'Tilt_A_Or_3_sin' => $fields['Tilt_A_Or_3_sin'] ?? null,
+    //                 'created_at' => $item['created_at'],
+    //                 'updated_at' => $item['updated_at']
+    //             ];
+    //         }, $data);
 
-            return view('note', ['data' => json_encode($filteredData)]);
-        } else {
-            return response()->json(['message' => 'Failed to fetch data'], 500);
-        }
-    }
+    //         return view('note', ['data' => json_encode($filteredData)]);
+    //     } else {
+    //         return response()->json(['message' => 'Failed to fetch data'], 500);
+    //     }
+    // }
 
     public function showLandSlideData(Request $request)
     {
@@ -110,7 +110,7 @@ class ShowChartController extends Controller
             })->values();
 
             $chartData->push([
-                'label' => 'Điểm chuẩn',
+                'label' => 'Bắt đầu',
                 'data' => [
                     ['x' => -0.001565, 'y' => -6],
                     ['x' => 0.009616, 'y' => -11],
@@ -119,7 +119,7 @@ class ShowChartController extends Controller
             ]);
 
             $chartDataB->push([
-                'label' => 'Điểm chuẩn',
+                'label' => 'Bắt đầu',
                 'data' => [
                     ['x' => -0.03261, 'y' => -6],
                     ['x' => -0.053559, 'y' => -11],
@@ -142,28 +142,28 @@ class ShowChartController extends Controller
         }
     }
 
-    public function chartData()
-    {
-        $response = Http::get('http://171.244.133.49/api/getLandSlideRawData');
+    // public function chartData()
+    // {
+    //     $response = Http::get('http://171.244.133.49/api/getLandSlideRawData');
         
-        if ($response->successful()) {
-            $data = $response->json()['data'];
-            $filteredData = array_map(function($item) {
-                $fields = [];
-                foreach (explode(';', $item['raw_content']) as $field) {
-                    list($key, $value) = explode(',', $field);
-                    $fields[$key] = $value;
-                }
-                return [
-                    'id' => $item['id'],
-                    'PZ1_Digit' => $fields['PZ1_(Digit)'] ?? null,
-                    'created_at' => $item['created_at'],
-                ];
-            }, $data);
+    //     if ($response->successful()) {
+    //         $data = $response->json()['data'];
+    //         $filteredData = array_map(function($item) {
+    //             $fields = [];
+    //             foreach (explode(';', $item['raw_content']) as $field) {
+    //                 list($key, $value) = explode(',', $field);
+    //                 $fields[$key] = $value;
+    //             }
+    //             return [
+    //                 'id' => $item['id'],
+    //                 'PZ1_Digit' => $fields['PZ1_(Digit)'] ?? null,
+    //                 'created_at' => $item['created_at'],
+    //             ];
+    //         }, $data);
 
-            return view('note', ['data' => json_encode($filteredData)]);
-        } else {
-            return response()->json(['message' => 'Failed to fetch data'], 500);
-        }
-    }
+    //         return view('note', ['data' => json_encode($filteredData)]);
+    //     } else {
+    //         return response()->json(['message' => 'Failed to fetch data'], 500);
+    //     }
+    // }
 }

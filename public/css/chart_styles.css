@@ -1,0 +1,27 @@
+#chartContainer {
+    width: 90%;
+    margin: auto;
+    position: relative;
+}
+.toggle-legend {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+.arrow-icon {
+    font-size: 18px;
+    transition: transform 0.3s;
+}
+.arrow-icon.up {
+    transform: rotate(180deg);
+}
