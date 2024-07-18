@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "chartisan/php": "*",
+        "consoletvs/charts": "*",
         "guzzlehttp/guzzle": "*",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9"
